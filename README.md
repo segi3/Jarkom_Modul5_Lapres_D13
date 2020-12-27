@@ -37,9 +37,9 @@ xterm -T MADIUN -e linux ubd0=MADIUN,jarkom umid=MADIUN eth0=daemon,,,switch1 me
 
 <br>
 
-> B. Bibah meminta kalian untuk membuat topologi tersebut menggunakan teknik CIDR atau VLSM.
+> B. Bibah meminta kalian untuk membuat topologi tersebut menggunakan teknik **CIDR** atau **VLSM**.
 
-Subnetting menggunakan VLSM
+Subnetting menggunakan **VLSM**
 
 ![](/img/B-1.PNG)
 ![](/img/B-3.PNG)
@@ -65,9 +65,9 @@ route add -net 0.0.0.0 netmask 0.0.0.0 gw 192.168.0.1
 
 <br>
 
-> D. memberikan ip pada subnet SIDOARJO dan GRESIK secara dinamis menggunakan bantuan DHCP SERVER dan DHCP RELAY
+> D. memberikan ip pada subnet **SIDOARJO** dan **GRESIK** secara dinamis menggunakan bantuan DHCP SERVER dan DHCP RELAY
 
-DHCP SERVER - MOJOKERTO
+DHCP SERVER - **MOJOKERTO**
 ```c
 subnet 192.168.2.0 netmask 255.255.255.0 {
     range 192.168.2.2 192.168.2.254;
@@ -88,34 +88,39 @@ subnet 192.168.3.0 netmask 255.255.255.0 {
 }
 ```
 
-DHCP RELAY - BATU
+DHCP RELAY - **BATU**
 ```c
 interface: eth0 eth1
 server: 10.151.79.115 
 ```
 
-DHCP RELAY - SURABAYA
+DHCP RELAY - **SURABAYA**
 ```c
 interface: eth1 eth2
 server: 10.151.79.115 
 ```
 
-DHCP RELAY - KEDIRI
+DHCP RELAY - **KEDIRI**
 ```c
 interface: eth0 eth1 eth2
 server: 10.151.79.115 
 ```
 
-> 1. Mengkonfigurasi SURABAYA menggunakan iptables, namun Bibah tidak ingin kalian menggunakan MASQUERADE.
+<br>
 
-UML SURABAYA
+> 1. Mengkonfigurasi **SURABAYA** menggunakan iptables, namun Bibah tidak ingin kalian menggunakan MASQUERADE.
+
+UML **SURABAYA**
 ```c
 iptables -t nat -A POSTROUTING -s 192.168.0.0/16 -o eth0 -j SNAT --to-source 10.151.78.58
 ```
 
-> 2. mendrop semua akses SSH dari luar Topologi (UML) Kalian pada server yang memiliki ip DMZ (DHCP dan DNS SERVER) pada SURABAYA demi menjaga keamanan.
+<br>
 
-UML SURABAYA
+
+> 2. mendrop semua akses SSH dari luar Topologi (UML) Kalian pada server yang memiliki ip DMZ (DHCP dan DNS SERVER) pada **SURABAYA** demi menjaga keamanan.
+
+UML **SURABAYA**
 ```c
 iptables -N VAR2
 iptables -A VAR2 -j LOG --log-prefix 'DROPPED PACKET FROM PORT 22 =>' --log-level 6
@@ -124,9 +129,12 @@ iptables -A VAR2 -j DROP
 iptables -A FORWARD -i eth0 -p tcp -d 10.151.79.112/29 --dport 22 -j VAR2
 ```
 
-> 3. Bibah meminta kalian untuk membatasi DHCP dan DNS server hanya boleh menerima maksimal 3 koneksi ICMP secara bersamaan yang berasal dari mana saja menggunakan iptables pada masing masing server, selebihnya akan di DROP.
+<br>
 
-UML MALANG
+
+> 3. Bibah meminta kalian untuk membatasi DHCP dan DNS server hanya boleh menerima maksimal 3 koneksi ICMP secara bersamaan yang berasal dari mana saja menggunakan **iptables pada masing masing server**, selebihnya akan di DROP.
+
+UML **MALANG**
 ```c
 iptables -N VAR3
 iptables -A VAR3 -j LOG --log-prefix 'DROPPED INCOMING ICMP =>' --log-level 6
@@ -135,7 +143,7 @@ iptables -A VAR3 -j DROP
 iptables -A INPUT -p icmp -m connlimit --connlimit-above 3 --connlimit-mask 0 -j VAR3
 ```
 
-UML MOJOKERTO
+UML **MOJOKERTO**
 ```c
 iptables -N VAR3
 iptables -A VAR3 -j LOG --log-prefix 'DROPPED INCOMING ICMP =>' --log-level 6
@@ -144,9 +152,12 @@ iptables -A VAR3 -j DROP
 iptables -A INPUT -p icmp -m connlimit --connlimit-above 3 --connlimit-mask 0 -j VAR3
 ```
 
-> 4. Akses dari subnet SIDOARJO hanya diperbolehkan pada pukul 07.00 - 17.00 pada hari Senin sampai Jumat. Selain itu paket akan di REJECT.
+<br>
 
-UML MALANG
+
+> 4. Akses dari subnet **SIDOARJO** hanya diperbolehkan pada pukul 07.00 - 17.00 pada hari Senin sampai Jumat. Selain itu paket akan di REJECT.
+
+UML **MALANG**
 ```c
 iptables -N VAR4
 iptables -A VAR4 -j LOG --log-prefix 'DROPPED PACKET =>' --log-level 6
@@ -156,9 +167,12 @@ iptables -A INPUT -s 192.168.2.0/24 -m time --timestart 07:00 --timestop 17:00 -
 iptables -A INPUT -s 192.168.2.0/24 -j VAR4
 ```
 
-> 5. Akses dari subnet GRESIK hanya diperbolehkan pada pukul 17.00 hingga pukul 07.00 setiap harinya. Selain itu paket akan di REJECT.
+<br>
 
-UML MALANG
+
+> 5. Akses dari subnet **GRESIK** hanya diperbolehkan pada pukul 17.00 hingga pukul 07.00 setiap harinya. Selain itu paket akan di REJECT.
+
+UML **MALANG**
 ```c
 iptables -N VAR5
 iptables -A VAR5 -j LOG --log-prefix 'DROPPED PACKET =>' --log-level 6
@@ -166,13 +180,19 @@ iptables -A VAR5 -j REJECT
 iptables -A INPUT -s 192.168.3.0/24 -m time --timestart 07:00 --timestop 17:00 -j VAR5
 ```
 
-> 6. Bibah ingin SURABAYA disetting sehingga setiap request dari client yang mengakses DNS Server akan didistribusikan secara bergantian pada PROBOLINGGO port 80 dan MADIUN port 80.
+<br>
 
-UML SURABAYA
+
+> 6. Bibah ingin **SURABAYA** disetting sehingga setiap request dari client yang mengakses DNS Server akan didistribusikan secara bergantian pada **PROBOLINGGO** port 80 dan **MADIUN** port 80.
+
+UML **SURABAYA**
 ```c
 iptables -t nat -A PREROUTING -p tcp -d 10.151.79.114 -m statistic --mode nth --every 2 --packet 0 -j DNAT --to-destination 192.168.0.10:80
 iptables -t nat -A PREROUTING -p tcp -d 10.151.79.114 -j DNAT --to-destination 192.168.0.11:80
 ```
+
+<br>
+
 
 > 7. Bibah ingin agar semua paket didrop oleh firewall (dalam topologi) tercatat dalam log pada setiap UML yang memiliki aturan drop.
 

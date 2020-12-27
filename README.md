@@ -162,8 +162,8 @@ UML **MALANG**
 iptables -N VAR4
 iptables -A VAR4 -j LOG --log-prefix 'DROPPED PACKET =>' --log-level 6
 iptables -A VAR4 -j REJECT
-iptables -A INPUT -s 192.168.2.0/24 -m time --timestart 07:00 --timestop 17:00 --weekdays Mon,Tue,Wed,Thu,Fri -j ACCEPT
 
+iptables -A INPUT -s 192.168.2.0/24 -m time --timestart 07:00 --timestop 17:00 --weekdays Mon,Tue,Wed,Thu,Fri -j ACCEPT
 iptables -A INPUT -s 192.168.2.0/24 -j VAR4
 ```
 
@@ -177,6 +177,7 @@ UML **MALANG**
 iptables -N VAR5
 iptables -A VAR5 -j LOG --log-prefix 'DROPPED PACKET =>' --log-level 6
 iptables -A VAR5 -j REJECT
+
 iptables -A INPUT -s 192.168.3.0/24 -m time --timestart 07:00 --timestop 17:00 -j VAR5
 ```
 
